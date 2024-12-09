@@ -24,7 +24,7 @@ export default function InvestorPage() {
     try {
       await connectAsync({ 
         connector: injected(),
-        chainId: 11155111 // Sepolia chain ID
+        chainId: 11155111
       });
     } catch (error) {
       console.error('Failed to connect:', error);
@@ -59,7 +59,6 @@ export default function InvestorPage() {
     }
 
     try {
-      // Create payment request with owner's address as payee
       const request = await createRentalPackageRequest(
         pkg.annualRentalIncome,
         pkg.upfrontPrice,
@@ -67,13 +66,9 @@ export default function InvestorPage() {
         process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS || '',
       );
       
-      // Mint the receivable
       await mintReceivable(request, signer);
-      
-      // Pay the receivable
       await payReceivable(request, signer, pkg.upfrontPrice.toString());
       
-      // Update package status
       const res = await fetch(`/api/packages/${pkg._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -85,72 +80,61 @@ export default function InvestorPage() {
 
       if (!res.ok) throw new Error('Failed to update package');
       
-      // Refresh packages list
       fetchPackages();
     } catch (error) {
       console.error('Error purchasing package:', error);
     }
   };
 
-  if (isLoading) return <div className="text-center p-8">Loading...</div>;
+  if (isLoading) return <div className="text-center">Loading...</div>;
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Available Packages</h1>
-        {isConnected ? (
-          <button
-            onClick={handleDisconnect}
-            className="px-4 py-2 border rounded"
-          >
-            Disconnect {ensName ?? address?.slice(0, 6)}
-          </button>
-        ) : (
-          <button
-            onClick={handleConnect}
-            className="px-4 py-2 bg-foreground text-background rounded"
-          >
-            Connect Wallet
-          </button>
-        )}
+    <div>
+      <div className="text-center mb-4">
+        <h1>Available Packages</h1>
       </div>
-      
-      <div className="max-w-4xl mx-auto grid gap-6">
-        {packages.map((pkg) => (
-          <div key={pkg._id} className="border rounded-lg p-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Annual Income</p>
-                <p className="text-xl font-semibold">${pkg.annualRentalIncome.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Discount Rate</p>
-                <p className="text-xl font-semibold">{pkg.discountRate}%</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Your Investment</p>
-                <p className="text-xl font-semibold">${pkg.upfrontPrice.toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Your Return</p>
-                <p className="text-xl font-semibold text-green-600">
-                  ${(pkg.annualRentalIncome - pkg.upfrontPrice).toLocaleString()}
-                </p>
+
+      <div className="text-center mb-4">
+        <div className="row">
+          {packages.map((pkg) => (
+            <div className="col-md-4 mb-3" key={pkg._id}>
+              <div className="card">
+                <div className="card-body">
+                  <div className="mb-3">
+                    <h5 className="card-title">Annual Income</h5>
+                    <p className="card-text">${pkg.annualRentalIncome.toLocaleString()}</p>
+                  </div>
+                  <div className="mb-3">
+                    <h5 className="card-title">Discount Rate</h5>
+                    <p className="card-text">{pkg.discountRate}%</p>
+                  </div>
+                  <div className="mb-3">
+                    <h5 className="card-title">Your Investment</h5>
+                    <p className="card-text">${pkg.upfrontPrice.toLocaleString()}</p>
+                  </div>
+                  <div className="mb-3">
+                    <h5 className="card-title">Your Return</h5>
+                    <p className="card-text">${(pkg.annualRentalIncome - pkg.upfrontPrice).toLocaleString()}</p>
+                  </div>
+                  
+                  <button 
+                    className="btn btn-primary w-100"
+                    onClick={() => handlePurchase(pkg)}
+                  >
+                    Purchase Package
+                  </button>
+                </div>
               </div>
             </div>
-            
-            <button
-              onClick={() => handlePurchase(pkg)}
-              className="w-full py-3 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Purchase Package
-            </button>
-          </div>
-        ))}
+          ))}
 
-        {packages.length === 0 && (
-          <p className="text-center text-gray-500">No packages available</p>
-        )}
+          {packages.length === 0 && (
+            <div className="col-12 text-center">
+              <p>No packages available</p>
+              <p>Check back soon or list your property</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

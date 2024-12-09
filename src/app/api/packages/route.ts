@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     await connectDB();
     
     const body = await request.json();
-    const { annualRentalIncome, discountRate } = body;
+    const { annualRentalIncome, discountRate, ownerAddress } = body;
     
     // Calculate upfront price
     const upfrontPrice = annualRentalIncome / (1 + (discountRate / 100));
@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     const newPackage = await Package.create({
       annualRentalIncome,
       discountRate,
-      upfrontPrice
+      upfrontPrice,
+      ownerAddress,
     });
     
     return NextResponse.json(newPackage, { status: 201 });

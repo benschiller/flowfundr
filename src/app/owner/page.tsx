@@ -20,7 +20,7 @@ export default function OwnerPage() {
     try {
       await connectAsync({ 
         connector: injected(),
-        chainId: 11155111 // Sepolia chain ID
+        chainId: 11155111
       });
     } catch (error) {
       console.error('Failed to connect:', error);
@@ -71,46 +71,54 @@ export default function OwnerPage() {
   const upfrontPrice = calculateUpfrontPrice();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      <h1 className="text-3xl font-bold mb-8">Create Rental Cash Flow Package</h1>
+    <div>
+      <div className="text-center mb-4">
+        <h1>Create Rental Cash Flow Package</h1>
+      </div>
       
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-        <div>
-          <label className="block mb-2">Annual Rental Income ($)</label>
-          <input
-            type="number"
-            value={formData.annualRentalIncome}
-            onChange={(e) => setFormData(prev => ({ ...prev, annualRentalIncome: e.target.value }))}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-md-6 col-lg-4">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label className="form-label">Annual Rental Income ($)</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.annualRentalIncome}
+                  onChange={(e) => setFormData(prev => ({ ...prev, annualRentalIncome: e.target.value }))}
+                  required
+                />
+              </div>
 
-        <div>
-          <label className="block mb-2">Discount Rate (%)</label>
-          <input
-            type="number"
-            value={formData.discountRate}
-            onChange={(e) => setFormData(prev => ({ ...prev, discountRate: e.target.value }))}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+              <div className="mb-3">
+                <label className="form-label">Discount Rate (%)</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={formData.discountRate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, discountRate: e.target.value }))}
+                  required
+                />
+              </div>
 
-        {upfrontPrice && (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p>You will receive: ${upfrontPrice.toFixed(2)}</p>
+              {upfrontPrice && (
+                <div className="alert alert-info mb-3">
+                  <p className="mb-0">You will receive: ${upfrontPrice.toFixed(2)}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn btn-primary w-100"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Creating...' : 'Create Package'}
+              </button>
+            </form>
           </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full py-3 bg-foreground text-background rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
-          {isLoading ? 'Creating...' : 'Create Package'}
-        </button>
-      </form>
+        </div>
+      </div>
     </div>
   );
 } 
