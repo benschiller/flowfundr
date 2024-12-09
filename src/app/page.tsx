@@ -15,7 +15,7 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* <div className="text-center mb-4">
+      <div className="text-center mb-4">
         <h2>Available Investment Packages</h2>
         
         <div className="row">
@@ -39,7 +39,7 @@ export default async function Home() {
             </div>
           )}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }
